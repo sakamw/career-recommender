@@ -126,5 +126,5 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-HF_API_KEY = os.getenv("HF_API_KEY")
+GENAI_API_KEY = os.getenv("GENAI_API_KEY")
+GENAI_MODEL = os.getenv("GENAI_MODEL", "gemini-1.5-flash")

@@ -5,7 +5,28 @@
     <div class="card-body">
         <h3 class="card-title">{{ rec.career_name }}</h3>
         <span class="badge bg-success mb-3">{{ rec.score }}/10</span>
-        <p class="mb-0">{{ rec.explanation }}</p>
+        {% if details %}
+            <div class="mb-3">
+                <h6 class="text-uppercase text-muted mb-1">Why this path</h6>
+                <p class="mb-2">{{ details.why|default:"Not provided." }}</p>
+                <h6 class="text-uppercase text-muted mb-1">Benefits</h6>
+                <p class="mb-2">{{ details.benefits|default:"Not provided." }}</p>
+                <h6 class="text-uppercase text-muted mb-1">Employment opportunities</h6>
+                <p class="mb-2">{{ details.opportunities|default:"Not provided." }}</p>
+                <h6 class="text-uppercase text-muted mb-1">Related sub-paths</h6>
+                {% if details.sub_paths %}
+                    <ul class="mb-0">
+                        {% for sub in details.sub_paths %}
+                            <li>{{ sub }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="mb-0">Not provided.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="mb-0">{{ rec.explanation|linebreaks }}</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
