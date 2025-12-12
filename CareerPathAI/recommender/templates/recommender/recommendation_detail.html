@@ -1,34 +1,50 @@
-{% extends "recommender/base.html" %}
+{% extends "base.html" %}
 {% block title %}Recommendation{% endblock %}
 {% block content %}
 <div class="card shadow-sm">
-    <div class="card-body">
-        <h3 class="card-title">{{ rec.career_name }}</h3>
-        <span class="badge bg-success mb-3">{{ rec.score }}/10</span>
-        {% if details %}
-            <div class="mb-3">
-                <h6 class="text-uppercase text-muted mb-1">Why this path</h6>
-                <p class="mb-2">{{ details.why|default:"Not provided." }}</p>
-                <h6 class="text-uppercase text-muted mb-1">Benefits</h6>
-                <p class="mb-2">{{ details.benefits|default:"Not provided." }}</p>
-                <h6 class="text-uppercase text-muted mb-1">Employment opportunities</h6>
-                <p class="mb-2">{{ details.opportunities|default:"Not provided." }}</p>
-                <h6 class="text-uppercase text-muted mb-1">Related sub-paths</h6>
-                {% if details.sub_paths %}
-                    <ul class="mb-0">
-                        {% for sub in details.sub_paths %}
-                            <li>{{ sub }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="mb-0">Not provided.</p>
-                {% endif %}
-            </div>
-        {% else %}
-            <p class="mb-0">{{ rec.explanation|linebreaks }}</p>
-        {% endif %}
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h3 class="card-title mb-2">{{ rec.career_name }}</h3>
+        <span class="badge bg-success">{{ rec.score }}/10</span>
+      </div>
+      <form method="post" action="{% url 'delete_recommendation' rec.id %}" onsubmit="return confirm('Move to recycle bin?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+      </form>
     </div>
+    {% if details %}
+      {% if details.why %}
+      <div class="recommendation-section">
+        <h5>Why this path</h5>
+        <p class="mb-0">{{ details.why }}</p>
+      </div>
+      {% endif %}
+      {% if details.benefits %}
+      <div class="recommendation-section">
+        <h5>Benefits</h5>
+        <p class="mb-0">{{ details.benefits }}</p>
+      </div>
+      {% endif %}
+      {% if details.opportunities %}
+      <div class="recommendation-section">
+        <h5>Employment opportunities</h5>
+        <p class="mb-0">{{ details.opportunities }}</p>
+      </div>
+      {% endif %}
+      {% if details.sub_paths %}
+      <div class="recommendation-section">
+        <h5>Related sub-paths</h5>
+        <ul class="sub-paths-list mb-0">
+          {% for sub in details.sub_paths %}
+          <li>{{ sub }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    {% else %}
+      <p class="mb-0">{{ rec.explanation|linebreaks }}</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
-
-

@@ -1,27 +1,71 @@
-{% extends "recommender/base.html" %}
+{% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Your Recommendations</h2>
-    <a class="btn btn-primary" href="{% url 'questionnaire' %}">Fill Questionnaire</a>
+  <h2 class="mb-0">Your Recommendations</h2>
+  <a class="btn btn-primary" href="{% url 'questionnaire' %}">Fill Questionnaire</a>
 </div>
 {% if recommendations %}
-    <div class="list-group">
-        {% for rec in recommendations %}
-            <a href="{% url 'recommendation_detail' rec.id %}" class="list-group-item list-group-item-action">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <strong>{{ rec.career_name }}</strong><br>
-                        <small class="text-muted">{{ rec.created_at|date:"M d, Y H:i" }}</small>
-                    </div>
-                    <span class="badge bg-success">{{ rec.score }}/10</span>
-                </div>
-            </a>
-        {% endfor %}
+<div class="list-group mb-4">
+  {% for rec in recommendations %}
+  <div class="list-group-item">
+    <div class="d-flex justify-content-between align-items-center">
+      <a href="{% url 'recommendation_detail' rec.id %}" class="text-decoration-none flex-grow-1">
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong class="text-dark">{{ rec.career_name }}</strong><br />
+            <small class="text-muted">{{ rec.created_at|date:"M d, Y H:i" }}</small>
+          </div>
+          <span class="badge bg-success">{{ rec.score }}/10</span>
+        </div>
+      </a>
+      <form method="post" action="{% url 'delete_recommendation' rec.id %}" class="ms-2" onsubmit="return confirm('Move to recycle bin?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+      </form>
     </div>
+  </div>
+  {% endfor %}
+</div>
 {% else %}
-    <div class="alert alert-info">No recommendations yet. Fill out the questionnaire to get started.</div>
+<div class="alert alert-info mb-4">
+  No recommendations yet. Fill out the questionnaire to get started.
+</div>
 {% endif %}
+
+<!-- Recycle Bin Section -->
+<div class="mt-4">
+  <h3 class="mb-3">Recycle Bin</h3>
+  <p class="text-muted small mb-3">Items in recycle bin will be permanently deleted after 30 days.</p>
+  {% if recycle_bin %}
+  <div class="list-group">
+    {% for rec in recycle_bin %}
+    <div class="list-group-item bg-light">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong class="text-muted">{{ rec.career_name }}</strong><br />
+              <small class="text-muted">
+                Deleted: {{ rec.deleted_at|date:"M d, Y H:i" }}
+                ({{ rec.deleted_at|timesince }} ago)
+              </small>
+            </div>
+            <span class="badge bg-secondary">{{ rec.score }}/10</span>
+          </div>
+        </div>
+        <form method="post" action="{% url 'restore_recommendation' rec.id %}" class="ms-2">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-outline-primary">Restore</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-secondary">
+    Recycle bin is empty.
+  </div>
+  {% endif %}
+</div>
 {% endblock %}
-
-

@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class UserProfile(models.Model):
@@ -36,6 +39,27 @@ class Recommendation(models.Model):
     score = models.PositiveIntegerField()
     explanation = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.career_name} ({self.score}/10)"
+
+    @property
+    def is_deleted(self):
+        return self.deleted_at is not None
+
+    def soft_delete(self):
+        """Move to recycle bin"""
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        """Restore from recycle bin"""
+        self.deleted_at = None
+        self.save()
+
+    @classmethod
+    def cleanup_old_deleted(cls, days=30):
+        """Permanently delete items in recycle bin older than specified days"""
+        cutoff_date = timezone.now() - timedelta(days=days)
+        return cls.objects.filter(deleted_at__lt=cutoff_date).delete()

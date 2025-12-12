@@ -1,34 +1,34 @@
-{% extends "recommender/base.html" %}
-
-{% block title %}Welcome · CareerPathAI{% endblock %}
-
+{% extends "base.html" %} {% block title %}Welcome · CareerPathAI{% endblock %}
 {% block content %}
 <div class="row align-items-center">
-    <div class="col-lg-6">
-        <p class="text-uppercase text-primary fw-semibold mb-2">AI Career Guide</p>
-        <h1 class="display-5 fw-bold mb-3">Find your next AI/tech career path</h1>
-        <p class="lead mb-4">
-            Answer a short questionnaire and get tailored career recommendations.
-            Start with a quick signup—it's free.
-        </p>
-        <div class="d-flex gap-2">
-            <a class="btn btn-primary btn-lg" href="{% url 'register' %}">Get Started</a>
-            <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}">I already have an account</a>
-        </div>
-        <p class="text-muted mt-3 mb-0">No credit card. Quick to try.</p>
+  <div class="col-lg-6">
+    <p class="text-uppercase text-primary fw-semibold mb-2">AI Career Guide</p>
+    <h1 class="display-5 fw-bold mb-3">Find your next AI/tech career path</h1>
+    <p class="lead mb-4">
+      Answer a short questionnaire and get tailored career recommendations.
+      Start with a quick signup—it's free.
+    </p>
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary btn-lg" href="{% url 'register' %}"
+        >Get Started</a
+      >
+      <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}"
+        >I already have an account</a
+      >
     </div>
-    <div class="col-lg-5 offset-lg-1">
-        <div class="card shadow-sm border-0">
-            <div class="card-body">
-                <h5 class="card-title">How it works</h5>
-                <ol class="mb-3 ps-3">
-                    <li>Tell us your skills and interests.</li>
-                    <li>Our AI suggests roles and explains why.</li>
-                    <li>Track recommendations on your dashboard.</li>
-                </ol>
-            </div>
-        </div>
+    <p class="text-muted mt-3 mb-0">No credit card. Quick to try.</p>
+  </div>
+  <div class="col-lg-5 offset-lg-1">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title">How it works</h5>
+        <ol class="mb-3 ps-3">
+          <li>Tell us your skills and interests.</li>
+          <li>Our AI suggests roles and explains why.</li>
+          <li>Track recommendations on your dashboard.</li>
+        </ol>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
-

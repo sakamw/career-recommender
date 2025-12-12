@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Questionnaire
+from .models import Questionnaire, UserProfile
 
 
 class QuestionnaireForm(forms.ModelForm):
@@ -13,6 +13,16 @@ class QuestionnaireForm(forms.ModelForm):
             "strengths": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
             "preferred_work_style": forms.Select(attrs={"class": "form-select"}),
             "long_term_goal": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["headline", "bio"]
+        widgets = {
+            "headline": forms.TextInput(attrs={"class": "form-control"}),
+            "bio": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
 
 

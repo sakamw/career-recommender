@@ -1,11 +1,14 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .ai import generate_career_recommendation
-from .forms import QuestionnaireForm
+from .forms import QuestionnaireForm, UserProfileForm
 from .models import Questionnaire, Recommendation, UserProfile
 
 
@@ -35,14 +38,29 @@ def _parse_explanation(text: str) -> dict:
     return parsed
 
 
+def _clear_messages(request):
+    list(messages.get_messages(request))
+
+
 def landing(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
     return render(request, "recommender/landing.html")
 
 
+def _prep_user_form(form: UserCreationForm) -> UserCreationForm:
+    for name, field in form.fields.items():
+        field.widget.attrs.setdefault("class", "form-control")
+        field.widget.attrs.setdefault("required", True)
+        if "password" in name:
+            field.widget.attrs.setdefault("type", "password")
+    return form
+
+
 def register(request):
-    form = UserCreationForm(request.POST or None)
+    form = _prep_user_form(UserCreationForm(request.POST or None))
+    if request.method != "POST":
+        _clear_messages(request)
     if form.is_valid():
         user = form.save()
         UserProfile.objects.create(user=user)
@@ -61,7 +79,10 @@ def login_view(request):
             login(request, user)
             return redirect("dashboard")
         messages.error(request, "Invalid credentials.")
-    return render(request, "recommender/auth_register.html", {"form": UserCreationForm(), "login_mode": True})
+    form = _prep_user_form(UserCreationForm())
+    if request.method != "POST":
+        _clear_messages(request)
+    return render(request, "recommender/auth_register.html", {"form": form, "login_mode": True})
 
 
 def logout_view(request):
@@ -71,8 +92,38 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    recs = Recommendation.objects.filter(questionnaire__user=request.user).order_by("-created_at")[:5]
-    return render(request, "recommender/dashboard.html", {"recommendations": recs})
+    # Get active recommendations (not deleted)
+    recs = Recommendation.objects.filter(
+        questionnaire__user=request.user,
+        deleted_at__isnull=True
+    ).order_by("-created_at")[:5]
+    
+    # Get recycle bin items (deleted within last 30 days)
+    cutoff_date = timezone.now() - timedelta(days=30)
+    recycle_bin = Recommendation.objects.filter(
+        questionnaire__user=request.user,
+        deleted_at__isnull=False,
+        deleted_at__gte=cutoff_date
+    ).order_by("-deleted_at")
+    
+    # Auto-cleanup old deleted items (older than 30 days)
+    Recommendation.cleanup_old_deleted(days=30)
+    
+    return render(request, "recommender/dashboard.html", {
+        "recommendations": recs,
+        "recycle_bin": recycle_bin
+    })
+
+
+@login_required
+def profile(request):
+    profile_obj, _ = UserProfile.objects.get_or_create(user=request.user)
+    form = UserProfileForm(request.POST or None, instance=profile_obj)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Profile updated.")
+        return redirect("profile")
+    return render(request, "recommender/profile.html", {"form": form})
 
 
 @login_required
@@ -112,9 +163,32 @@ def questionnaire(request):
 @login_required
 def recommendation_detail(request, pk):
     rec = get_object_or_404(Recommendation, pk=pk, questionnaire__user=request.user)
+    if rec.deleted_at is not None:
+        messages.warning(request, "This recommendation is in the recycle bin.")
+        return redirect("dashboard")
     parsed = _parse_explanation(rec.explanation)
     return render(
         request,
         "recommender/recommendation_detail.html",
         {"rec": rec, "details": parsed},
     )
+
+
+@login_required
+def delete_recommendation(request, pk):
+    """Move recommendation to recycle bin"""
+    rec = get_object_or_404(Recommendation, pk=pk, questionnaire__user=request.user)
+    if rec.deleted_at is None:
+        rec.soft_delete()
+        messages.success(request, f"'{rec.career_name}' moved to recycle bin.")
+    return redirect("dashboard")
+
+
+@login_required
+def restore_recommendation(request, pk):
+    """Restore recommendation from recycle bin"""
+    rec = get_object_or_404(Recommendation, pk=pk, questionnaire__user=request.user)
+    if rec.deleted_at is not None:
+        rec.restore()
+        messages.success(request, f"'{rec.career_name}' restored from recycle bin.")
+    return redirect("dashboard")

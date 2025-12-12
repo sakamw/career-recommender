@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %}Profile{% endblock %} {% block
+content %}
+<div class="row">
+  <div class="col-lg-6">
+    <h2 class="mb-3">Your Profile</h2>
+    <form method="post" class="card shadow-sm border-0">
+      <div class="card-body">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Headline</label>
+          {{ form.headline }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Bio</label>
+          {{ form.bio }}
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
