@@ -1,0 +1,13 @@
+{% extends "recommender/base.html" %}
+{% block title %}Recommendation{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h3 class="card-title">{{ rec.career_name }}</h3>
+        <span class="badge bg-success mb-3">{{ rec.score }}/10</span>
+        <p class="mb-0">{{ rec.explanation }}</p>
+    </div>
+</div>
+{% endblock %}
+
+
