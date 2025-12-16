@@ -38,6 +38,14 @@ class Recommendation(models.Model):
     career_name = models.CharField(max_length=150)
     score = models.PositiveIntegerField()
     explanation = models.TextField()
+
+    # "Action plan" fields to help the user actually get started.
+    # Stored as JSON to keep them flexible and easy to render as lists.
+    getting_started = models.JSONField(default=list, blank=True)
+    resources = models.JSONField(default=list, blank=True)
+    interview_prep = models.JSONField(default=list, blank=True)
+    how_to_apply = models.JSONField(default=list, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 

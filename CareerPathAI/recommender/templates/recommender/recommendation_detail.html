@@ -46,6 +46,98 @@
     {% else %}
       <p class="mb-0">{{ rec.explanation|linebreaks }}</p>
     {% endif %}
+
+    {% if rec.getting_started or rec.interview_prep or rec.how_to_apply or rec.resources %}
+    <div class="recommendation-section">
+      <h5 class="mb-3">Action plan</h5>
+      <div class="accordion" id="actionPlanAccordion">
+        {% if rec.getting_started %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingGettingStarted">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGettingStarted" aria-expanded="true" aria-controls="collapseGettingStarted">
+              Getting started
+            </button>
+          </h2>
+          <div id="collapseGettingStarted" class="accordion-collapse collapse show" aria-labelledby="headingGettingStarted" data-bs-parent="#actionPlanAccordion">
+            <div class="accordion-body">
+              <ul class="mb-0">
+                {% for step in rec.getting_started %}
+                <li>{{ step }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if rec.interview_prep %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingInterview">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInterview" aria-expanded="false" aria-controls="collapseInterview">
+              Interview prep
+            </button>
+          </h2>
+          <div id="collapseInterview" class="accordion-collapse collapse" aria-labelledby="headingInterview" data-bs-parent="#actionPlanAccordion">
+            <div class="accordion-body">
+              <ul class="mb-0">
+                {% for tip in rec.interview_prep %}
+                <li>{{ tip }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if rec.how_to_apply %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingApply">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseApply" aria-expanded="false" aria-controls="collapseApply">
+              How to apply
+            </button>
+          </h2>
+          <div id="collapseApply" class="accordion-collapse collapse" aria-labelledby="headingApply" data-bs-parent="#actionPlanAccordion">
+            <div class="accordion-body">
+              <ul class="mb-0">
+                {% for step in rec.how_to_apply %}
+                <li>{{ step }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if rec.resources %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingResources">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResources" aria-expanded="false" aria-controls="collapseResources">
+              Resources
+            </button>
+          </h2>
+          <div id="collapseResources" class="accordion-collapse collapse" aria-labelledby="headingResources" data-bs-parent="#actionPlanAccordion">
+            <div class="accordion-body">
+              <div class="list-group">
+                {% for r in rec.resources %}
+                  {% if r.url %}
+                  <a class="list-group-item list-group-item-action" href="{{ r.url }}" target="_blank" rel="noopener noreferrer">
+                    {{ r.title }}
+                    <span class="text-muted small">(opens in new tab)</span>
+                  </a>
+                  {% else %}
+                  <div class="list-group-item">
+                    {{ r.title }}
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

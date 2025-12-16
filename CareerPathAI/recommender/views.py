@@ -156,6 +156,10 @@ def questionnaire(request):
                 career_name=item.get("career", "Career"),
                 score=item.get("score", 7),
                 explanation=explanation_text,
+                getting_started=item.get("getting_started") or [],
+                resources=item.get("resources") or [],
+                interview_prep=item.get("interview_prep") or [],
+                how_to_apply=item.get("how_to_apply") or [],
             )
         return redirect("dashboard")
     return render(request, "recommender/questionnaire.html", {"form": form})
@@ -171,7 +175,10 @@ def recommendation_detail(request, pk):
     return render(
         request,
         "recommender/recommendation_detail.html",
-        {"rec": rec, "details": parsed},
+        {
+            "rec": rec,
+            "details": parsed,  # legacy (older recs)
+        },
     )
 
 
