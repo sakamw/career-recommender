@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import Optional
 
 import requests
@@ -44,8 +45,41 @@ def generate_career_recommendation(data: dict) -> dict:
     skills = data.get("skills", "").lower()
     interests = data.get("interests", "").lower()
 
+    # Tokenize skills/interests to reduce accidental matches (e.g., "candidate" vs "data")
+    tokens = set(re.findall(r"[a-zA-Z]+", skills + " " + interests))
+
+    def any_token(*candidates):
+        return any(tok in tokens for tok in candidates)
+
+    # Technical intent: require explicit tech/coding signals, not just "data" or "analytics"
+    tech_signals = any_token(
+        "python",
+        "sql",
+        "javascript",
+        "java",
+        "c++",
+        "c",
+        "go",
+        "rust",
+        "model",
+        "models",
+        "ml",
+        "machine",
+        "deep",
+        "ai",
+        "engineer",
+        "developer",
+        "programming",
+        "coding",
+        "cloud",
+        "aws",
+        "azure",
+        "gcp",
+    )
+
     base = []
-    if "data" in skills:
+
+    if any_token("data", "analytics", "analyst", "analysis", "bi") and tech_signals:
         base.append(
             {
                 "career": "Data Scientist",
@@ -56,7 +90,7 @@ def generate_career_recommendation(data: dict) -> dict:
                 "sub_careers": ["ML Engineer", "Data Analyst"],
             }
         )
-    if "ml" in skills or "machine" in skills:
+    if any_token("ml", "machine", "ai", "model", "models", "mlops") and tech_signals:
         base.append(
             {
                 "career": "Machine Learning Engineer",
@@ -67,7 +101,7 @@ def generate_career_recommendation(data: dict) -> dict:
                 "sub_careers": ["Applied Scientist", "ML Platform Engineer"],
             }
         )
-    if "product" in skills or "product" in interests:
+    if any_token("product", "pm", "roadmap"):
         base.append(
             {
                 "career": "AI Product Manager",
@@ -78,7 +112,7 @@ def generate_career_recommendation(data: dict) -> dict:
                 "sub_careers": ["AI Product Owner", "Technical Program Manager"],
             }
         )
-    if "ops" in skills or "mlops" in skills:
+    if any_token("ops", "mlops", "devops", "platform") and tech_signals:
         base.append(
             {
                 "career": "MLOps Engineer",
@@ -89,16 +123,104 @@ def generate_career_recommendation(data: dict) -> dict:
                 "sub_careers": ["Model Reliability Engineer", "Data Platform Engineer"],
             }
         )
-    if not base:
+    # Non-technical leaning roles
+    if any_token("marketing", "growth", "sales", "business", "partnerships"):
         base.append(
             {
-                "career": "AI Product Specialist",
+                "career": "AI Solutions / Sales Engineer",
                 "score": 7,
-                "reason": "General AI interest assumed.",
-                "benefits": "Customer-facing, broad exposure to AI use-cases.",
-                "opportunities": "Solutions engineering, customer success, sales enablement.",
-                "sub_careers": ["Solutions Architect", "AI Implementation Consultant"],
+                "reason": "Business/market-facing interest detected.",
+                "benefits": "Bridge customers and product; strong earning potential.",
+                "opportunities": "SaaS presales, partner engineering, enterprise enablement.",
+                "sub_careers": ["Customer Engineer", "Partner Engineer"],
             }
+        )
+
+    if any_token("business", "analysis", "analyst", "strategy", "consulting", "operations", "process"):
+        base.append(
+            {
+                "career": "Business Analyst / Strategy Analyst",
+                "score": 7,
+                "reason": "Business/strategy focus detected.",
+                "benefits": "Influence decisions with insights; cross-functional impact.",
+                "opportunities": "Operations, strategy, PMO, transformation teams.",
+                "sub_careers": ["Strategy Associate", "Operations Analyst"],
+            }
+        )
+
+    if any_token("project", "program", "coordination", "delivery", "management"):
+        base.append(
+            {
+                "career": "Project / Program Coordinator",
+                "score": 7,
+                "reason": "Project coordination interest detected.",
+                "benefits": "Own delivery timelines; cross-functional exposure.",
+                "opportunities": "Implementation teams, PMOs, delivery offices.",
+                "sub_careers": ["Program Manager", "Implementation Lead"],
+            }
+        )
+
+    if any_token("design", "ux", "ui", "research", "prototype"):
+        base.append(
+            {
+                "career": "AI UX Designer / Researcher",
+                "score": 7,
+                "reason": "Design/UX inclination detected.",
+                "benefits": "Shape AI experiences and user trust.",
+                "opportunities": "Product design teams, research labs, design systems.",
+                "sub_careers": ["UX Researcher", "Conversation Designer"],
+            }
+        )
+
+    if any_token("writing", "content", "communication", "docs", "documentation"):
+        base.append(
+            {
+                "career": "Technical Writer (AI)",
+                "score": 7,
+                "reason": "Writing/communication strength detected.",
+                "benefits": "Explain complex AI topics clearly; flexible work setups.",
+                "opportunities": "Product documentation, developer relations content.",
+                "sub_careers": ["Developer Advocate (content)", "Docs Specialist"],
+            }
+        )
+
+    # If still empty, provide a diverse, non-technical set
+    if not base or not tech_signals:
+        base.extend(
+            [
+                {
+                    "career": "AI Product Specialist",
+                    "score": 7,
+                    "reason": "General AI interest assumed.",
+                    "benefits": "Customer-facing, broad exposure to AI use-cases.",
+                    "opportunities": "Solutions engineering, customer success, sales enablement.",
+                    "sub_careers": ["Solutions Architect", "AI Implementation Consultant"],
+                },
+                {
+                    "career": "Technical Writer (AI)",
+                    "score": 7,
+                    "reason": "Communication focus assumed.",
+                    "benefits": "Explain complex ideas; flexible/remote friendly.",
+                    "opportunities": "Docs teams, DevRel content, education.",
+                    "sub_careers": ["Docs Specialist", "Content Strategist"],
+                },
+                {
+                    "career": "AI Project Coordinator",
+                    "score": 7,
+                    "reason": "Coordination and delivery focus assumed.",
+                    "benefits": "Plan and ship; cross-team collaboration.",
+                    "opportunities": "Implementation projects, PMO roles.",
+                    "sub_careers": ["Program Coordinator", "Implementation Lead"],
+                },
+                {
+                    "career": "Business Analyst",
+                    "score": 7,
+                    "reason": "Business/operations focus assumed.",
+                    "benefits": "Improve processes and decisions; stakeholder-facing.",
+                    "opportunities": "Operations, strategy, transformation teams.",
+                    "sub_careers": ["Operations Analyst", "Strategy Analyst"],
+                },
+            ]
         )
 
     prompt = (
@@ -114,7 +236,17 @@ def generate_career_recommendation(data: dict) -> dict:
             parsed = json.loads(ai_text)
             recs = parsed.get("recommendations")
             if isinstance(recs, list) and recs:
-                return {"recommendations": recs[:3]}
+                if not tech_signals:
+                    tech_terms = ("engineer", "scientist", "developer", "ml", "ai", "data")
+                    filtered = []
+                    for r in recs:
+                        career = (r.get("career", "") or "").lower()
+                        if any(term in career for term in tech_terms):
+                            continue
+                        filtered.append(r)
+                    recs = filtered or recs  # if filtering wipes out all, keep originals
+                if recs:
+                    return {"recommendations": recs[:3]}
         except Exception:
             # Fallback to heuristic if parsing fails
             pass

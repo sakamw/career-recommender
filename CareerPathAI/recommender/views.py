@@ -135,7 +135,8 @@ def questionnaire(request):
         questionnaire.save()
 
         ai_result = generate_career_recommendation(form.cleaned_data)
-        for item in ai_result.get("recommendations", []):
+        recs = ai_result.get("recommendations", [])[:1]  # limit to a single feedback per questionnaire
+        for item in recs:
             reason = item.get("reason", "Why not provided.")
             benefits = item.get("benefits", "Benefits not provided.")
             opportunities = item.get("opportunities", "Opportunities not provided.")

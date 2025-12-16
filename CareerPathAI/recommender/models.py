@@ -60,6 +60,6 @@ class Recommendation(models.Model):
 
     @classmethod
     def cleanup_old_deleted(cls, days=30):
-        """Permanently delete items in recycle bin older than specified days"""
+        """Permanently delete items in recycle bin"""
         cutoff_date = timezone.now() - timedelta(days=days)
         return cls.objects.filter(deleted_at__lt=cutoff_date).delete()
