@@ -46,6 +46,15 @@ class Recommendation(models.Model):
     interview_prep = models.JSONField(default=list, blank=True)
     how_to_apply = models.JSONField(default=list, blank=True)
 
+    # Generation metadata (useful for demo + debugging + reliability)
+    generation_source = models.CharField(max_length=20, default="unknown")  # genai|heuristic|unknown
+    model_name = models.CharField(max_length=100, blank=True, default="")
+    prompt_version = models.CharField(max_length=50, blank=True, default="")
+
+    # Lightweight feedback loop
+    user_rating = models.SmallIntegerField(null=True, blank=True)  # 1=helpful, -1=not helpful
+    user_rating_note = models.TextField(blank=True, default="")
+
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 

@@ -7,7 +7,28 @@
     <div class="d-flex justify-content-between align-items-start mb-3">
       <div>
         <h3 class="card-title mb-2">{{ rec.career_name }}</h3>
-        <span class="badge bg-success">{{ rec.score }}/10</span>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="badge bg-success">{{ rec.score }}/10</span>
+          {% if rec.generation_source %}
+          <span class="badge bg-secondary">{{ rec.generation_source }}</span>
+          {% endif %}
+          {% if rec.model_name %}
+          <span class="badge bg-light text-dark">{{ rec.model_name }}</span>
+          {% endif %}
+          {% if rec.prompt_version %}
+          <span class="badge bg-light text-dark">{{ rec.prompt_version }}</span>
+          {% endif %}
+        </div>
+        <div class="mt-2 d-flex flex-wrap gap-2">
+          <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/jobs/search/?keywords={{ rec.career_name|urlencode }}">Search on LinkedIn</a>
+          <a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" href="https://www.indeed.com/jobs?q={{ rec.career_name|urlencode }}">Search on Indeed</a>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            data-copy-share
+            data-share-text="CareerPathAI — {{ rec.career_name }} ({{ rec.score }}/10)\n\nWhy: {{ details.why|default:''|escapejs }}\n\nGetting started: {% for s in rec.getting_started|slice:':3' %}- {{ s|escapejs }}\n{% endfor %}\nResources: {% for r in rec.resources|slice:':3' %}- {{ r.title|escapejs }}{% if r.url %} ({{ r.url|escapejs }}){% endif %}\n{% endfor %}"
+          >Copy summary</button>
+        </div>
       </div>
       <form method="post" action="{% url 'delete_recommendation' rec.id %}" onsubmit="return confirm('Move to recycle bin?');">
         {% csrf_token %}
@@ -49,7 +70,16 @@
 
     {% if rec.getting_started or rec.interview_prep or rec.how_to_apply or rec.resources %}
     <div class="recommendation-section">
-      <h5 class="mb-3">Action plan</h5>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Action plan</h5>
+        <div class="text-muted small">
+          {% if rec.user_rating == 1 %}
+            Marked helpful
+          {% elif rec.user_rating == -1 %}
+            Marked not helpful
+          {% endif %}
+        </div>
+      </div>
       <div class="accordion" id="actionPlanAccordion">
         {% if rec.getting_started %}
         <div class="accordion-item">
@@ -135,6 +165,27 @@
           </div>
         </div>
         {% endif %}
+      </div>
+
+      <hr class="my-4" />
+
+      <div>
+        <h6 class="mb-2">Was this recommendation useful?</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <form method="post" action="{% url 'rate_recommendation' rec.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="rating" value="1" />
+            <button type="submit" class="btn btn-sm btn-success">Helpful</button>
+          </form>
+          <form method="post" action="{% url 'rate_recommendation' rec.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="rating" value="-1" />
+            <button type="submit" class="btn btn-sm btn-outline-danger">Not helpful</button>
+          </form>
+        </div>
+        <p class="text-muted small mt-2 mb-0">
+          This is stored privately to help you refine results over time.
+        </p>
       </div>
     </div>
     {% endif %}

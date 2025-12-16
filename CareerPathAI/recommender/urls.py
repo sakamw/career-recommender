@@ -8,6 +8,7 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("questionnaire/", views.questionnaire, name="questionnaire"),
     path("recommendation/<int:pk>/", views.recommendation_detail, name="recommendation_detail"),
+    path("recommendation/<int:pk>/rate/", views.rate_recommendation, name="rate_recommendation"),
     path("recommendation/<int:pk>/delete/", views.delete_recommendation, name="delete_recommendation"),
     path("recommendation/<int:pk>/restore/", views.restore_recommendation, name="restore_recommendation"),
     path("auth/register/", views.register, name="register"),

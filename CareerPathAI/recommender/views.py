@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .ai import generate_career_recommendation
 from .forms import QuestionnaireForm, UserProfileForm
@@ -13,13 +14,6 @@ from .models import Questionnaire, Recommendation, UserProfile
 
 
 def _parse_explanation(text: str) -> dict:
-    """
-    Expected format:
-    Why: ...
-    Benefits: ...
-    Employment opportunities: ...
-    Related sub-paths: ...
-    """
     parsed = {"why": "", "benefits": "", "opportunities": "", "sub_paths": []}
     if not text:
         return parsed
@@ -160,6 +154,9 @@ def questionnaire(request):
                 resources=item.get("resources") or [],
                 interview_prep=item.get("interview_prep") or [],
                 how_to_apply=item.get("how_to_apply") or [],
+                generation_source=item.get("generation_source", "unknown"),
+                model_name=item.get("model_name", ""),
+                prompt_version=item.get("prompt_version", ""),
             )
         return redirect("dashboard")
     return render(request, "recommender/questionnaire.html", {"form": form})
@@ -177,7 +174,7 @@ def recommendation_detail(request, pk):
         "recommender/recommendation_detail.html",
         {
             "rec": rec,
-            "details": parsed,  # legacy (older recs)
+            "details": parsed,
         },
     )
 
@@ -200,3 +197,27 @@ def restore_recommendation(request, pk):
         rec.restore()
         messages.success(request, f"'{rec.career_name}' restored from recycle bin.")
     return redirect("dashboard")
+
+
+@require_POST
+@login_required
+def rate_recommendation(request, pk):
+    rec = get_object_or_404(Recommendation, pk=pk, questionnaire__user=request.user)
+    if rec.deleted_at is not None:
+        messages.warning(request, "Cannot rate items in the recycle bin.")
+        return redirect("dashboard")
+
+    rating = request.POST.get("rating")
+    note = (request.POST.get("note") or "").strip()
+
+    if rating not in ("1", "-1"):
+        messages.error(request, "Invalid rating.")
+        return redirect("recommendation_detail", pk=rec.id)
+
+    rec.user_rating = int(rating)
+    if note:
+        rec.user_rating_note = note
+    rec.save(update_fields=["user_rating", "user_rating_note"])
+
+    messages.success(request, "Thanks for the feedback!")
+    return redirect("recommendation_detail", pk=rec.id)

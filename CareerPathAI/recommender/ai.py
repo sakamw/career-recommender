@@ -9,6 +9,9 @@ GENAI_API_KEY = os.getenv("GENAI_API_KEY")
 GENAI_MODEL = os.getenv("GENAI_MODEL", "gemini-1.5-flash")
 GENAI_ENDPOINT = f"https://generativelanguage.googleapis.com/v1beta/models/{GENAI_MODEL}:generateContent"
 
+# Bump this when you change the shape/intent of the prompt.
+PROMPT_VERSION = "v2-action-plan-1"
+
 
 def _default_action_plan_for(career_name: str) -> dict:
     """Reasonable, curated defaults (used for fallback and to fill AI gaps)."""
@@ -266,6 +269,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "High demand, versatile across industries, strong pay.",
                 "opportunities": "Tech, finance, healthcare, product analytics roles.",
                 "sub_careers": ["ML Engineer", "Data Analyst"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("Data Scientist"),
             }
         )
@@ -278,6 +284,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Impactful model deployment, work with modern stacks.",
                 "opportunities": "Platform teams, product ML features, AI startups.",
                 "sub_careers": ["Applied Scientist", "ML Platform Engineer"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("Machine Learning Engineer"),
             }
         )
@@ -290,6 +299,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Blend of strategy and AI, cross-functional leadership.",
                 "opportunities": "AI feature ownership, roadmap planning, GTM roles.",
                 "sub_careers": ["AI Product Owner", "Technical Program Manager"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("AI Product Manager"),
             }
         )
@@ -302,6 +314,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Own reliability and scalability of AI systems.",
                 "opportunities": "Infra teams, platform engineering, observability roles.",
                 "sub_careers": ["Model Reliability Engineer", "Data Platform Engineer"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("MLOps Engineer"),
             }
         )
@@ -315,6 +330,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Bridge customers and product; strong earning potential.",
                 "opportunities": "SaaS presales, partner engineering, enterprise enablement.",
                 "sub_careers": ["Customer Engineer", "Partner Engineer"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("AI Solutions / Sales Engineer"),
             }
         )
@@ -328,6 +346,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Influence decisions with insights; cross-functional impact.",
                 "opportunities": "Operations, strategy, PMO, transformation teams.",
                 "sub_careers": ["Strategy Associate", "Operations Analyst"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("Business Analyst"),
             }
         )
@@ -341,6 +362,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Own delivery timelines; cross-functional exposure.",
                 "opportunities": "Implementation teams, PMOs, delivery offices.",
                 "sub_careers": ["Program Manager", "Implementation Lead"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("Project Coordinator"),
             }
         )
@@ -354,6 +378,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Shape AI experiences and user trust.",
                 "opportunities": "Product design teams, research labs, design systems.",
                 "sub_careers": ["UX Researcher", "Conversation Designer"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("AI UX Designer"),
             }
         )
@@ -367,6 +394,9 @@ def generate_career_recommendation(data: dict) -> dict:
                 "benefits": "Explain complex AI topics clearly; flexible work setups.",
                 "opportunities": "Product documentation, developer relations content.",
                 "sub_careers": ["Developer Advocate (content)", "Docs Specialist"],
+                "generation_source": "heuristic",
+                "model_name": "local",
+                "prompt_version": PROMPT_VERSION,
                 **_default_action_plan_for("Technical Writer"),
             }
         )
@@ -382,6 +412,9 @@ def generate_career_recommendation(data: dict) -> dict:
                     "benefits": "Customer-facing, broad exposure to AI use-cases.",
                     "opportunities": "Solutions engineering, customer success, sales enablement.",
                     "sub_careers": ["Solutions Architect", "AI Implementation Consultant"],
+                    "generation_source": "heuristic",
+                    "model_name": "local",
+                    "prompt_version": PROMPT_VERSION,
                     **_default_action_plan_for("AI Product Specialist"),
                 },
                 {
@@ -391,6 +424,9 @@ def generate_career_recommendation(data: dict) -> dict:
                     "benefits": "Explain complex ideas; flexible/remote friendly.",
                     "opportunities": "Docs teams, DevRel content, education.",
                     "sub_careers": ["Docs Specialist", "Content Strategist"],
+                    "generation_source": "heuristic",
+                    "model_name": "local",
+                    "prompt_version": PROMPT_VERSION,
                     **_default_action_plan_for("Technical Writer"),
                 },
                 {
@@ -400,6 +436,9 @@ def generate_career_recommendation(data: dict) -> dict:
                     "benefits": "Plan and ship; cross-team collaboration.",
                     "opportunities": "Implementation projects, PMO roles.",
                     "sub_careers": ["Program Coordinator", "Implementation Lead"],
+                    "generation_source": "heuristic",
+                    "model_name": "local",
+                    "prompt_version": PROMPT_VERSION,
                     **_default_action_plan_for("Project Coordinator"),
                 },
                 {
@@ -409,6 +448,9 @@ def generate_career_recommendation(data: dict) -> dict:
                     "benefits": "Improve processes and decisions; stakeholder-facing.",
                     "opportunities": "Operations, strategy, transformation teams.",
                     "sub_careers": ["Operations Analyst", "Strategy Analyst"],
+                    "generation_source": "heuristic",
+                    "model_name": "local",
+                    "prompt_version": PROMPT_VERSION,
                     **_default_action_plan_for("Business Analyst"),
                 },
             ]
@@ -460,6 +502,9 @@ def generate_career_recommendation(data: dict) -> dict:
                             "resources": _normalize_resources(r.get("resources") or defaults.get("resources")),
                             "interview_prep": _ensure_list(r.get("interview_prep") or defaults.get("interview_prep")),
                             "how_to_apply": _ensure_list(r.get("how_to_apply") or defaults.get("how_to_apply")),
+                            "generation_source": "genai",
+                            "model_name": GENAI_MODEL,
+                            "prompt_version": PROMPT_VERSION,
                         }
                     )
 
@@ -469,4 +514,16 @@ def generate_career_recommendation(data: dict) -> dict:
             # Fallback to heuristic if parsing fails
             pass
 
-    return {"recommendations": base[:3]}
+    # Ensure base recommendations always contain metadata, even if new roles were added without it.
+    normalized_base = []
+    for r in base[:3]:
+        normalized_base.append(
+            {
+                **r,
+                "generation_source": r.get("generation_source") or "heuristic",
+                "model_name": r.get("model_name") or "local",
+                "prompt_version": r.get("prompt_version") or PROMPT_VERSION,
+            }
+        )
+
+    return {"recommendations": normalized_base}

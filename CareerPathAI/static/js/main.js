@@ -22,6 +22,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Copy share summary (recommendation detail)
+    document.querySelectorAll('[data-copy-share]').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const text = this.getAttribute('data-share-text') || '';
+            if (!text) return;
+
+            try {
+                await navigator.clipboard.writeText(text);
+                const original = this.textContent;
+                this.textContent = 'Copied!';
+                setTimeout(() => { this.textContent = original; }, 1200);
+            } catch (e) {
+                // Fallback for older browsers
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.top = '-9999px';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    const original = this.textContent;
+                    this.textContent = 'Copied!';
+                    setTimeout(() => { this.textContent = original; }, 1200);
+                } finally {
+                    document.body.removeChild(ta);
+                }
+            }
+        });
+    });
 });
 
 // Helper function to format dates (if needed)
